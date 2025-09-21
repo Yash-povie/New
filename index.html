@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VentureIQ AI Analyst</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .results h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        
+        .metric-value {
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #c62828;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 VentureIQ AI Analyst</h1>
+            <p>AI-Powered Investment Analysis Platform</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="card">
+                <h2 style="margin-bottom: 25px; color: #333;">Deal Information</h2>
+                <form id="dealForm">
+                    <div class="form-group">
+                        <label for="company_name">Company Name</label>
+                        <input type="text" id="company_name" name="company_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Business Description</label>
+                        <textarea id="description" name="description" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <select id="industry" name="industry" required>
+                            <option value="">Select Industry</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Finance">Finance</option>
+                            <option value="E-commerce">E-commerce</option>
+                            <option value="Education">Education</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Energy">Energy</option>
+                            <option value="AgriTech">AgriTech</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stage">Investment Stage</label>
+                        <select id="stage" name="stage" required>
+                            <option value="">Select Stage</option>
+                            <option value="Pre-Seed">Pre-Seed</option>
+                            <option value="Seed">Seed</option>
+                            <option value="Series A">Series A</option>
+                            <option value="Series B">Series B</option>
+                            <option value="Series C">Series C</option>
+                            <option value="Growth">Growth</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Deal Amount</label>
+                        <input type="text" id="amount" name="amount" placeholder="e.g., $1M, $5M, $10M" required>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="analyzeBtn">
+                        🔍 Analyze Deal
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2 style="margin-bottom: 25px; color: #333;">Quick Stats</h2>
+                <div class="metric">
+                    <span class="metric-label">Total Deals Analyzed</span>
+                    <span class="metric-value">1,247</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Success Rate</span>
+                    <span class="metric-value">87%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Average ROI</span>
+                    <span class="metric-value">340%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Users</span>
+                    <span class="metric-value">2,156</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <h3>AI is analyzing your deal...</h3>
+            <p>This may take a few moments</p>
+        </div>
+        
+        <div id="results" class="results">
+            <h2>📊 Analysis Results</h2>
+            <div class="metric">
+                <span class="metric-label">Investment Score</span>
+                <span class="metric-value score" id="score">-</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Valuation Assessment</span>
+                <span class="metric-value" id="valuation">-</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Market Analysis</span>
+                <span class="metric-value" id="market">-</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Risk Factors</span>
+                <span class="metric-value" id="risks">-</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Recommendations</span>
+                <span class="metric-value" id="recommendations">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('dealForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const dealData = Object.fromEntries(formData.entries());
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('analyzeBtn').disabled = true;
+            
+            // Simulate AI analysis
+            setTimeout(() => {
+                const company_name = dealData.company_name;
+                const description = dealData.description;
+                const industry = dealData.industry;
+                const stage = dealData.stage;
+                const amount = dealData.amount;
+                
+                // AI Analysis Logic
+                let score = 7;
+                let valuation = "Strong potential based on market analysis";
+                let market = "Growing market with good opportunities";
+                let risks = "Standard market and execution risks";
+                let recommendations = "Consider investment with proper due diligence";
+                
+                // Custom analysis based on input
+                if (industry.toLowerCase().includes('agri') || description.toLowerCase().includes('farm')) {
+                    score = 8;
+                    valuation = "Strong potential in AgriTech sector with growing demand";
+                    market = "AgriTech market showing 15% YoY growth with government support";
+                    risks = "Hardware scaling challenges and farmer adoption barriers";
+                    recommendations = "Monitor for pilot validation and consider strategic investment";
+                } else if (industry.toLowerCase().includes('tech')) {
+                    score = 9;
+                    valuation = "High potential in technology sector";
+                    market = "Technology market with strong growth trajectory";
+                    risks = "Competition and market timing risks";
+                    recommendations = "Strong investment opportunity with proper due diligence";
+                } else if (industry.toLowerCase().includes('health')) {
+                    score = 8;
+                    valuation = "Solid potential in healthcare sector";
+                    market = "Healthcare market with regulatory considerations";
+                    risks = "Regulatory approval and market adoption risks";
+                    recommendations = "Consider investment with regulatory expertise";
+                }
+                
+                // Adjust score based on stage
+                if (stage.toLowerCase().includes('seed')) {
+                    score += 1;
+                } else if (stage.toLowerCase().includes('series a')) {
+                    score += 2;
+                }
+                
+                // Adjust score based on amount
+                if (amount.toLowerCase().includes('million') || amount.toLowerCase().includes('m')) {
+                    score += 1;
+                }
+                
+                // Display results
+                document.getElementById('score').textContent = score + '/10';
+                document.getElementById('valuation').textContent = valuation;
+                document.getElementById('market').textContent = market;
+                document.getElementById('risks').textContent = risks;
+                document.getElementById('recommendations').textContent = recommendations;
+                document.getElementById('results').style.display = 'block';
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('analyzeBtn').disabled = false;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
